@@ -1,725 +1,377 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import Image from "next/image";
 
 const SUBSTACK_URL = "https://findthesignal.substack.com/";
 const CHECKOUT_URL = "https://buy.stripe.com/3cIcN5fCp1CR0qz2RBefC04";
+const COACHING_URL = "https://t.me/samelsner";
 
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll("[data-reveal]");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            (entry.target as HTMLElement).style.opacity = "1";
-            (entry.target as HTMLElement).style.transform = "translateY(0)";
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.08 }
-    );
-    els.forEach((el) => {
-      (el as HTMLElement).style.opacity = "0";
-      (el as HTMLElement).style.transform = "translateY(20px)";
-      (el as HTMLElement).style.transition =
-        "opacity 0.7s ease, transform 0.7s ease";
-      observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
-}
+/* ── Types ───────────────────────────────────────────────────── */
+type Card = {
+  tag: string;
+  title: string;
+  description: string;
+  cta: string;
+  href: string;
+  external?: boolean;
+  closed?: boolean;
+};
 
-const recentIssues = [
+/* ── Offerings ───────────────────────────────────────────────── */
+const cards: Card[] = [
   {
-    title: "The Noise You're Listening To is Shaping Your Becoming",
-    date: "Mar 2, 2026",
-    url: "https://findthesignal.substack.com/p/the-noise-youre-listening-to",
+    tag: "Course · $197",
+    title: "Foundations",
+    description:
+      "The operating system for ecological skill acquisition. 8 sessions that permanently rewire how you see training, learning, and performance.",
+    cta: "Enroll in Foundations",
+    href: CHECKOUT_URL,
+    external: true,
   },
   {
-    title: "The Split",
-    date: "Mar 1, 2026",
-    url: "https://findthesignal.substack.com/p/the-split",
+    tag: "Newsletter · Free",
+    title: "Signal/Noise",
+    description:
+      "Weekly letters on ecological psychology, skill acquisition, and the philosophy of performance. The signal inside the noise.",
+    cta: "Subscribe to Signal/Noise",
+    href: SUBSTACK_URL,
+    external: true,
   },
   {
-    title: "Simplicity Comes Last, Not First",
-    date: "Feb 25, 2026",
-    url: "https://findthesignal.substack.com/p/simplicity-comes-last",
+    tag: "Private · $500–$888/mo",
+    title: "1:1 Coaching",
+    description:
+      "Work directly with Sam in a private coaching container. Ecological dynamics applied to your specific plateau — sport, business, or creative practice.",
+    cta: "Begin the Conversation",
+    href: COACHING_URL,
+    external: true,
   },
   {
-    title: "Repetition Without Repetition",
-    date: "Feb 18, 2026",
-    url: "https://findthesignal.substack.com/p/repetition-without-repetition",
+    tag: "Writing · Free",
+    title: "Articles",
+    description:
+      "Essays and frameworks on ecological dynamics, skill acquisition, and perception-action theory. The science behind everything Attune teaches.",
+    cta: "Read the Writing",
+    href: SUBSTACK_URL,
+    external: true,
   },
   {
-    title: "The Environment Is the Teacher",
-    date: "Feb 11, 2026",
-    url: "https://findthesignal.substack.com/p/the-environment-is-the-teacher",
+    tag: "Cohort · Coming Soon",
+    title: "Foundations Live",
+    description:
+      "A live cohort experience with group accountability, weekly sessions, and direct access. Built for practitioners who want to apply the framework in real time.",
+    cta: "Currently closed — stay tuned",
+    href: "#",
+    closed: true,
+  },
+  {
+    tag: "Members · Included",
+    title: "Course Access",
+    description:
+      "Already enrolled? Sign in to access your Foundations modules, track your progress, and continue where you left off.",
+    cta: "Go to Dashboard",
+    href: "/dashboard",
   },
 ];
 
-const eyebrow: React.CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontSize: "0.625rem",
-  letterSpacing: "0.22em",
-  textTransform: "uppercase" as const,
-  color: "rgba(255,255,255,0.3)",
-  marginBottom: "2rem",
-};
-
-const border: React.CSSProperties = {
-  borderTop: "1px solid rgba(255,255,255,0.07)",
-};
-
+/* ── Page ────────────────────────────────────────────────────── */
 export default function Home() {
-  useReveal();
-
   return (
-    <main className="text-white">
-
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "var(--void)",
+        color: "#ffffff",
+        fontFamily: "var(--font-sans)",
+      }}
+    >
       {/* ── NAV ──────────────────────────────────────────────── */}
       <nav
         style={{
-          position: "fixed",
-          top: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 50,
-          padding: "1.375rem 1.5rem",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "760px",
+          padding: "1.5rem clamp(1.25rem,5vw,3rem)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
         }}
       >
-        <Link
-          href="/"
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontSize: "1.125rem",
-            fontWeight: 600,
-            color: "#ffffff",
-            textDecoration: "none",
-            letterSpacing: "-0.01em",
-          }}
-        >
-          Attune
-        </Link>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "1.75rem" }}>
-          <a
-            href={CHECKOUT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+        {/* Logo mark */}
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+          <Image
+            src="/attune-logo.png"
+            alt="Attune"
+            width={28}
+            height={28}
+            style={{ filter: "invert(1)", objectFit: "contain", opacity: 0.9 }}
+          />
+          <span
             style={{
-              fontSize: "0.8125rem",
-              color: "rgba(255,255,255,0.45)",
-              textDecoration: "none",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.45)")
-            }
-          >
-            Foundations
-          </a>
-          <a
-            href={SUBSTACK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: "0.8125rem",
-              color: "rgba(255,255,255,0.45)",
-              textDecoration: "none",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.45)")
-            }
-          >
-            Signal/Noise →
-          </a>
-        </div>
-      </nav>
-
-      {/* ── HERO ─────────────────────────────────────────────── */}
-      <section
-        data-reveal
-        style={{
-          paddingTop: "clamp(8rem, 22vw, 14rem)",
-          paddingBottom: "clamp(5rem, 13vw, 9rem)",
-        }}
-      >
-        <p style={eyebrow}>Sam Elsner · Ecological Dynamics · Attune</p>
-
-        <h1
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontWeight: 600,
-            fontSize: "clamp(3.5rem, 13vw, 9.5rem)",
-            lineHeight: 0.88,
-            letterSpacing: "-0.03em",
-            color: "#ffffff",
-            marginBottom: "0.15em",
-          }}
-        >
-          The environment
-        </h1>
-        <h1
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontWeight: 600,
-            fontSize: "clamp(3.5rem, 13vw, 9.5rem)",
-            lineHeight: 0.88,
-            letterSpacing: "-0.03em",
-            color: "rgba(255,255,255,0.28)",
-            marginBottom: "clamp(2rem, 6vw, 3.5rem)",
-          }}
-        >
-          is the teacher.
-        </h1>
-
-        <p
-          style={{
-            fontSize: "clamp(1rem, 2.2vw, 1.175rem)",
-            lineHeight: 1.74,
-            color: "rgba(255,255,255,0.6)",
-            maxWidth: "500px",
-            marginBottom: "2.75rem",
-          }}
-        >
-          2× NCAA National Champion. Ecological psychologist. I write{" "}
-          <em style={{ color: "#ffffff", fontStyle: "italic" }}>
-            Signal/Noise
-          </em>{" "}
-          — weekly letters on skill acquisition, ecological dynamics, and why
-          everything you were taught about learning is wrong. Join 500+
-          practitioners who changed how they see everything.
-        </p>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "2rem",
-            flexWrap: "wrap",
-          }}
-        >
-          <a
-            href={SUBSTACK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              backgroundColor: "var(--crimson)",
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
+              fontWeight: 600,
+              fontSize: "1.125rem",
               color: "#ffffff",
-              fontSize: "0.8125rem",
-              fontWeight: 500,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              padding: "0.75rem 1.75rem",
-              textDecoration: "none",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--crimson-bright)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--crimson)")
-            }
-          >
-            Read Signal/Noise →
-          </a>
-          <a
-            href={CHECKOUT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: "0.875rem",
-              color: "rgba(255,255,255,0.45)",
-              textDecoration: "none",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.45)")
-            }
-          >
-            Enroll in Foundations →
-          </a>
-        </div>
-      </section>
-
-      {/* ── MANIFESTO ────────────────────────────────────────── */}
-      <section
-        data-reveal
-        style={{
-          ...border,
-          paddingTop: "clamp(6rem, 15vw, 10rem)",
-          paddingBottom: "clamp(6rem, 15vw, 10rem)",
-        }}
-      >
-        <h2
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontWeight: 600,
-            fontSize: "clamp(2.75rem, 10vw, 8rem)",
-            lineHeight: 0.9,
-            letterSpacing: "-0.03em",
-            color: "rgba(255,255,255,0.75)",
-            marginBottom: "0.08em",
-          }}
-        >
-          Skill is forged,
-        </h2>
-        <h2
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontWeight: 600,
-            fontSize: "clamp(2.75rem, 10vw, 8rem)",
-            lineHeight: 0.9,
-            letterSpacing: "-0.03em",
-            color: "var(--crimson)",
-            marginBottom: "clamp(2rem, 5vw, 3rem)",
-          }}
-        >
-          not taught.
-        </h2>
-        <p
-          style={{
-            fontSize: "clamp(0.9375rem, 1.8vw, 1.0625rem)",
-            lineHeight: 1.75,
-            color: "rgba(255,255,255,0.48)",
-            maxWidth: "460px",
-          }}
-        >
-          Every coach and educator tells you to practice harder, focus more,
-          trust the process. Nobody tells you about the environment. That is the
-          problem I have dedicated my life to solving.
-        </p>
-      </section>
-
-      {/* ── THE WORK ─────────────────────────────────────────── */}
-      <section
-        data-reveal
-        style={{
-          ...border,
-          paddingTop: "clamp(4rem, 10vw, 6.5rem)",
-          paddingBottom: "clamp(4rem, 10vw, 6.5rem)",
-        }}
-      >
-        <p style={eyebrow}>The Work</p>
-
-        <a
-          href={CHECKOUT_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "block",
-            padding: "1.875rem 0",
-            textDecoration: "none",
-            color: "inherit",
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-            transition: "padding-left 0.25s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.paddingLeft = "0.5rem")}
-          onMouseLeave={(e) => (e.currentTarget.style.paddingLeft = "0")}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              justifyContent: "space-between",
-              gap: "1rem",
-              marginBottom: "0.625rem",
+              letterSpacing: "-0.01em",
             }}
           >
-            <span
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "1rem",
-                fontWeight: 500,
-                color: "#ffffff",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Foundations
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.6rem",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.28)",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            >
-              Course · $197 →
-            </span>
-          </div>
-          <p
-            style={{
-              fontSize: "0.9375rem",
-              lineHeight: 1.7,
-              color: "rgba(255,255,255,0.52)",
-              maxWidth: "520px",
-            }}
-          >
-            The operating system for ecological skill acquisition. 8 sessions
-            that rewire how you read your environment — applied across coaching,
-            business, creativity, and performance.
-          </p>
-        </a>
+            Attune
+          </span>
+        </Link>
 
         <a
           href={SUBSTACK_URL}
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            display: "block",
-            padding: "1.875rem 0",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.625rem",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.4)",
             textDecoration: "none",
-            color: "inherit",
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-            borderBottom: "1px solid rgba(255,255,255,0.07)",
-            transition: "padding-left 0.25s ease",
+            transition: "color 0.2s",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.paddingLeft = "0.5rem")}
-          onMouseLeave={(e) => (e.currentTarget.style.paddingLeft = "0")}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              justifyContent: "space-between",
-              gap: "1rem",
-              marginBottom: "0.625rem",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "1rem",
-                fontWeight: 500,
-                color: "#ffffff",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Signal/Noise
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.6rem",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.28)",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            >
-              Newsletter · Free →
-            </span>
-          </div>
-          <p
-            style={{
-              fontSize: "0.9375rem",
-              lineHeight: 1.7,
-              color: "rgba(255,255,255,0.52)",
-              maxWidth: "520px",
-            }}
-          >
-            Weekly letters on ecological psychology, skill acquisition, and the
-            philosophy of performance. The signal inside the noise. 500+
-            practitioners, every Tuesday.
-          </p>
+          Signal/Noise →
         </a>
-      </section>
+      </nav>
 
-      {/* ── RECENT LETTERS ───────────────────────────────────── */}
+      {/* ── HERO ─────────────────────────────────────────────── */}
       <section
-        data-reveal
         style={{
-          paddingTop: "clamp(4rem, 10vw, 6.5rem)",
-          paddingBottom: "clamp(4rem, 10vw, 6.5rem)",
+          textAlign: "center",
+          padding: "clamp(4rem,10vw,7rem) clamp(1.25rem,5vw,3rem) clamp(3rem,8vw,5rem)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
         }}
       >
-        <p style={eyebrow}>Recent Letters</p>
+        <h1
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontStyle: "italic",
+            fontWeight: 600,
+            fontSize: "clamp(3rem,10vw,7rem)",
+            lineHeight: 0.92,
+            letterSpacing: "-0.03em",
+            color: "#ffffff",
+            marginBottom: "1.5rem",
+          }}
+        >
+          Attune
+        </h1>
 
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {recentIssues.map((issue, i) => (
-            <a
-              key={i}
-              href={issue.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "flex",
-                alignItems: "baseline",
-                justifyContent: "space-between",
-                gap: "1.5rem",
-                padding: "1.125rem 0",
-                borderTop: "1px solid rgba(255,255,255,0.07)",
-                borderBottom:
-                  i === recentIssues.length - 1
-                    ? "1px solid rgba(255,255,255,0.07)"
-                    : "none",
-                textDecoration: "none",
-                color: "inherit",
-              }}
-              onMouseEnter={(e) => {
-                const t = e.currentTarget.querySelector(
-                  ".issue-title"
-                ) as HTMLElement;
-                if (t) t.style.color = "#ffffff";
-              }}
-              onMouseLeave={(e) => {
-                const t = e.currentTarget.querySelector(
-                  ".issue-title"
-                ) as HTMLElement;
-                if (t) t.style.color = "rgba(255,255,255,0.65)";
-              }}
-            >
-              <span
-                className="issue-title"
-                style={{
-                  fontSize: "0.9375rem",
-                  lineHeight: 1.5,
-                  color: "rgba(255,255,255,0.65)",
-                  transition: "color 0.2s",
-                  flex: 1,
-                }}
-              >
-                {issue.title}
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.12em",
-                  color: "rgba(255,255,255,0.22)",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                {issue.date}
-              </span>
-            </a>
+        {/* Logo mark centered below title */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem", opacity: 0.6 }}>
+          <Image
+            src="/attune-logo.png"
+            alt=""
+            aria-hidden="true"
+            width={44}
+            height={44}
+            style={{ filter: "invert(1)", objectFit: "contain" }}
+          />
+        </div>
+
+        <p
+          style={{
+            fontSize: "clamp(0.9375rem,1.8vw,1.0625rem)",
+            lineHeight: 1.75,
+            color: "rgba(255,255,255,0.52)",
+            maxWidth: "480px",
+            margin: "0 auto",
+          }}
+        >
+          Courses, coaching, and writing to develop perception, build skill, and
+          operate at your edge.
+        </p>
+      </section>
+
+      {/* ── CARD GRID ────────────────────────────────────────── */}
+      <section
+        style={{
+          maxWidth: "960px",
+          margin: "0 auto",
+          padding: "clamp(2.5rem,6vw,4rem) clamp(1.25rem,4vw,2rem) clamp(4rem,10vw,6rem)",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "1px",
+            background: "rgba(255,255,255,0.06)",
+          }}
+        >
+          {cards.map((card) => (
+            <CardItem key={card.title} card={card} />
           ))}
-        </div>
-
-        <div style={{ marginTop: "1.75rem" }}>
-          <a
-            href={SUBSTACK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: "0.8125rem",
-              color: "rgba(255,255,255,0.32)",
-              textDecoration: "none",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.7)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.32)")
-            }
-          >
-            View all issues →
-          </a>
-        </div>
-      </section>
-
-      {/* ── ABOUT ────────────────────────────────────────────── */}
-      <section
-        data-reveal
-        style={{
-          ...border,
-          paddingTop: "clamp(4rem, 10vw, 6.5rem)",
-          paddingBottom: "clamp(4rem, 10vw, 6.5rem)",
-        }}
-      >
-        <p style={eyebrow}>Sam Elsner</p>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.35rem",
-            marginBottom: "2.25rem",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "clamp(1rem, 2vw, 1.125rem)",
-              lineHeight: 1.76,
-              color: "rgba(255,255,255,0.7)",
-            }}
-          >
-            I won two national championships by doing what I was told. Specific
-            drills. Isolated repetitions. Pattern memorization. Then I found
-            ecological psychology and realized I had been training in the wrong
-            environment for years.
-          </p>
-          <p
-            style={{
-              fontSize: "clamp(1rem, 2vw, 1.125rem)",
-              lineHeight: 1.76,
-              color: "rgba(255,255,255,0.7)",
-            }}
-          >
-            I built Attune for the coaches, creators, and performers who feel
-            it — something is wrong with how we train and how we build.
-            Gibson&apos;s ecological psychology, Bernstein&apos;s movement
-            science, and Stoic philosophy all pointed to the same truth: the
-            environment shapes everything. That is what I teach.
-          </p>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "2rem",
-            flexWrap: "wrap",
-          }}
-        >
-          <a
-            href={SUBSTACK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              backgroundColor: "var(--crimson)",
-              color: "#ffffff",
-              fontSize: "0.8125rem",
-              fontWeight: 500,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              padding: "0.625rem 1.5rem",
-              textDecoration: "none",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--crimson-bright)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--crimson)")
-            }
-          >
-            Read Signal/Noise →
-          </a>
-          <a
-            href="https://x.com/samelsner"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: "0.875rem",
-              color: "rgba(255,255,255,0.38)",
-              textDecoration: "none",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.8)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.38)")
-            }
-          >
-            X / Twitter →
-          </a>
         </div>
       </section>
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer
         style={{
-          ...border,
-          paddingTop: "clamp(4rem, 10vw, 6rem)",
-          paddingBottom: "clamp(3rem, 8vw, 5rem)",
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          padding: "2rem clamp(1.25rem,5vw,3rem)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "1rem",
         }}
       >
-        <p
+        <a
+          href={SUBSTACK_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontWeight: 600,
-            fontSize: "clamp(1.375rem, 4vw, 2.625rem)",
-            color: "rgba(255,255,255,0.08)",
-            letterSpacing: "-0.02em",
-            lineHeight: 1.25,
-            marginBottom: "3rem",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.625rem",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.32)",
+            textDecoration: "none",
+            transition: "color 0.2s",
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.32)")}
         >
-          The environment is the teacher.
-          <br />
-          Your job is to attune.
-        </p>
+          About Sam →
+        </a>
 
-        <div
+        <span
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "1.75rem",
-            flexWrap: "wrap",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.575rem",
+            letterSpacing: "0.12em",
+            color: "rgba(255,255,255,0.18)",
           }}
         >
-          {[
-            { label: "Signal/Noise", href: SUBSTACK_URL },
-            { label: "Foundations", href: CHECKOUT_URL },
-            { label: "X", href: "https://x.com/samelsner" },
-            { label: "Instagram", href: "https://instagram.com/sam.elsner" },
-          ].map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontSize: "0.8125rem",
-                color: "rgba(255,255,255,0.28)",
-                textDecoration: "none",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.color = "rgba(255,255,255,0.65)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = "rgba(255,255,255,0.28)")
-              }
-            >
-              {label}
-            </a>
-          ))}
-          <span
-            style={{
-              marginLeft: "auto",
-              fontSize: "0.6875rem",
-              color: "rgba(255,255,255,0.15)",
-              fontFamily: "var(--font-mono)",
-            }}
-          >
-            © 2026 Attune
-          </span>
-        </div>
+          © 2026 Attune. All rights reserved.
+        </span>
       </footer>
     </main>
+  );
+}
+
+/* ── Card component ──────────────────────────────────────────── */
+function CardItem({ card }: { card: Card }) {
+  const Tag = card.external ? "a" : Link;
+  const linkProps = card.external
+    ? { href: card.closed ? undefined : card.href, target: "_blank", rel: "noopener noreferrer" }
+    : { href: card.href };
+
+  return (
+    <div
+      style={{
+        background: "var(--void)",
+        display: "flex",
+        flexDirection: "column",
+        padding: "clamp(1.5rem,4vw,2.5rem)",
+        minHeight: "280px",
+      }}
+    >
+      {/* Tag header — mimics the teal icon block on Jack's site */}
+      <div
+        style={{
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          paddingBottom: "1rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.575rem",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: card.closed ? "rgba(255,255,255,0.22)" : "var(--crimson)",
+          }}
+        >
+          {card.tag}
+        </span>
+      </div>
+
+      {/* Content */}
+      <h3
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontStyle: "italic",
+          fontWeight: 600,
+          fontSize: "clamp(1.375rem,2.5vw,1.75rem)",
+          lineHeight: 1.1,
+          letterSpacing: "-0.01em",
+          color: card.closed ? "rgba(255,255,255,0.38)" : "#ffffff",
+          marginBottom: "0.875rem",
+        }}
+      >
+        {card.title}
+      </h3>
+
+      <p
+        style={{
+          fontSize: "0.9rem",
+          lineHeight: 1.72,
+          color: card.closed ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.52)",
+          flex: 1,
+          marginBottom: "1.75rem",
+        }}
+      >
+        {card.description}
+      </p>
+
+      {/* CTA Button — mirrors Jack's full-width card button */}
+      {card.closed ? (
+        <button
+          disabled
+          style={{
+            width: "100%",
+            padding: "0.75rem 1rem",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.25)",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.625rem",
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            cursor: "not-allowed",
+            textAlign: "center",
+          }}
+        >
+          {card.cta}
+        </button>
+      ) : (
+        // @ts-expect-error — dynamic tag
+        <Tag
+          {...linkProps}
+          style={{
+            display: "block",
+            width: "100%",
+            padding: "0.75rem 1rem",
+            background: "#ffffff",
+            color: "#000000",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.625rem",
+            fontWeight: 600,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            textDecoration: "none",
+            textAlign: "center",
+            transition: "background 0.18s, color 0.18s",
+            boxSizing: "border-box",
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.88)";
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
+            e.currentTarget.style.background = "#ffffff";
+          }}
+        >
+          {card.cta}
+        </Tag>
+      )}
+    </div>
   );
 }
