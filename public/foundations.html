@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foundations — Attune | Stop Training the Pattern. Train the Perception.</title>
+  <meta name="description" content="For coaches and athletes who've drilled everything right and still lose it when it counts. Foundations is the framework built on the science of why skill transfers — and why it doesn't." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --bg: #09090b;
+      --surface: #111113;
+      --surface-2: #18181b;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.14);
+      --text: #fafafa;
+      --text-2: rgba(250,250,250,0.60);
+      --text-3: rgba(250,250,250,0.35);
+      --crimson: #e11d48;
+      --crimson-b: #f43f5e;
+      --crimson-dim: rgba(225,29,72,0.10);
+      --crimson-glow: rgba(225,29,72,0.20);
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+
+      --space-1: 8px;
+      --space-2: 16px;
+      --space-3: 24px;
+      --space-4: 32px;
+      --space-5: 40px;
+      --space-6: 48px;
+      --space-8: 64px;
+      --space-10: 80px;
+      --space-12: 96px;
+      --space-16: 128px;
+
+      --section-py: clamp(96px, 10vw, 160px);
+      --max-w: 1100px;
+    }
+
+    html {
+      background: var(--bg);
+    }
+
+    body {
+      background: transparent;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.75;
+      font-weight: 300;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Scroll Progress Bar ──────────────────────────────────────── */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--crimson);
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Terrain Canvas ────────────────────────────────────────────── */
+    #terrain-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ─── Ambient Orb ───────────────────────────────────────────────── */
+    #ambient-orb {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--crimson-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      transition: left 0.6s ease, top 0.6s ease;
+      opacity: 0.5;
+    }
+
+    /* ─── Layout Helpers ────────────────────────────────────────────── */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--space-4);
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--crimson);
+      margin-bottom: var(--space-3);
+      display: block;
+    }
+
+    /* ─── Scroll Reveal ─────────────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+    /* ─── Navigation ────────────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 var(--space-4);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(9,9,11,0);
+      backdrop-filter: blur(0px);
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease;
+    }
+
+    .nav.scrolled {
+      background: rgba(9,9,11,0.95);
+      backdrop-filter: blur(16px);
+      border-color: var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--crimson);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-2);
+      text-decoration: none;
+      transition: color 0.2s;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      background: var(--crimson);
+      color: var(--text) !important;
+      padding: 8px 20px;
+      font-weight: 500 !important;
+      font-size: 13px !important;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--crimson-b) !important;
+    }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: var(--text);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .nav-mobile {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: rgba(9,9,11,0.98);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-4);
+      z-index: 99;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .nav-mobile.open { display: flex; }
+
+    .nav-mobile a {
+      color: var(--text-2);
+      text-decoration: none;
+      font-size: 15px;
+      padding: var(--space-1) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-mobile a:last-child { border-bottom: none; }
+
+    /* ─── Buttons ───────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+      position: relative;
+    }
+
+    .btn-primary {
+      background: var(--crimson);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--crimson-b);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border-hover);
+      color: var(--text);
+    }
+
+    .btn-arrow::after {
+      content: '→';
+      transition: transform 0.2s ease;
+    }
+
+    .btn-arrow:hover::after {
+      transform: translateX(4px);
+    }
+
+    /* ─── Hero ──────────────────────────────────────────────────────── */
+    .hero {
+      padding-top: calc(64px + clamp(64px, 8vw, 120px));
+      padding-bottom: var(--section-py);
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--crimson);
+      border: 1px solid var(--crimson-glow);
+      background: var(--crimson-dim);
+      padding: 6px 16px;
+      margin-bottom: var(--space-4);
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(52px, 7vw, 96px);
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-4);
+      color: var(--text);
+    }
+
+    .hero h1 .word { display: inline-block; opacity: 0; }
+
+    .hero-cycling-word {
+      color: var(--crimson);
+      display: inline;
+      transition: opacity 0.35s ease;
+    }
+
+    .hero-cycling-word.fading {
+      opacity: 0;
+    }
+
+    .hero-sub {
+      max-width: 600px;
+      margin: 0 auto var(--space-6);
+      font-size: 16px;
+      color: var(--text-2);
+      line-height: 1.75;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-10);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: var(--space-6);
+      justify-content: center;
+      flex-wrap: wrap;
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1;
+      display: block;
+    }
+
+    .hero-stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ─── Problem Section ───────────────────────────────────────────── */
+    .section-problem {
+      padding: var(--section-py) 0;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      align-items: start;
+    }
+
+    .problem-left h2 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: var(--space-4);
+    }
+
+    .problem-left p {
+      color: var(--text-2);
+      font-size: 16px;
+    }
+
+    .problem-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .problem-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 15px;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+
+    .problem-list li::before {
+      content: '×';
+      color: var(--crimson);
+      font-size: 18px;
+      font-weight: 400;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    /* ─── Shift Section ─────────────────────────────────────────────── */
+    .section-shift {
+      padding: var(--section-py) 0;
+      text-align: center;
+    }
+
+    .shift-quote {
+      max-width: 840px;
+      margin: 0 auto var(--space-10);
+    }
+
+    .shift-quote blockquote {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(28px, 3.5vw, 44px);
+      line-height: 1.3;
+      color: var(--text);
+      border-left: 3px solid var(--crimson);
+      padding-left: var(--space-4);
+      text-align: left;
+      margin-bottom: var(--space-4);
+    }
+
+    .shift-quote cite {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      font-style: normal;
+    }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+    }
+
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: var(--space-5);
+      text-align: left;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .pillar-card:hover {
+      background: rgba(24,24,27,0.95);
+      border-color: var(--border-hover);
+    }
+
+    .pillar-number {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 48px;
+      font-weight: 300;
+      color: rgba(225,29,72,0.30);
+      line-height: 1;
+      margin-bottom: var(--space-2);
+      display: block;
+    }
+
+    .pillar-card h3 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: var(--space-2);
+    }
+
+    .pillar-card p {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+
+    /* ─── Before/After Table ────────────────────────────────────────── */
+    .section-comparison {
+      padding: var(--section-py) 0;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .comparison-table th {
+      padding: var(--space-3) var(--space-4);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .comparison-table th:first-child { border-right: 1px solid var(--border); }
+    .comparison-table th.highlight { color: var(--crimson); background: var(--crimson-dim); }
+
+    .comparison-table td {
+      padding: var(--space-3) var(--space-4);
+      font-size: 14px;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .comparison-table td:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .comparison-table td.highlight {
+      color: var(--text);
+      background: var(--crimson-dim);
+    }
+
+    .comparison-table tr:last-child td { border-bottom: none; }
+
+    /* ─── What's Inside ─────────────────────────────────────────────── */
+    .section-inside {
+      padding: var(--section-py) 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: var(--space-3);
+    }
+
+    .section-header p {
+      max-width: 520px;
+      margin: 0 auto;
+      color: var(--text-2);
+      font-size: 16px;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+    }
+
+    .bento-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: var(--space-5);
+      transition: background 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bento-card:hover {
+      background: rgba(24,24,27,0.95);
+      border-color: var(--border-hover);
+    }
+
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--crimson);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .bento-card:hover::before { opacity: 1; }
+
+    .module-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--crimson);
+      margin-bottom: var(--space-2);
+      display: block;
+    }
+
+    .bento-card h3 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: var(--space-2);
+      line-height: 1.2;
+    }
+
+    .bento-card p {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+
+    /* ─── Testimonials ──────────────────────────────────────────────── */
+    .section-testimonials {
+      padding: var(--section-py) 0;
+    }
+
+    .testimonial-featured {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: var(--space-8);
+      margin-bottom: var(--space-6);
+      position: relative;
+    }
+
+    .testimonial-featured::before {
+      content: '"';
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 120px;
+      line-height: 1;
+      color: rgba(225,29,72,0.22);
+      position: absolute;
+      top: -16px;
+      left: var(--space-5);
+    }
+
+    .testimonial-featured blockquote {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(20px, 2.5vw, 28px);
+      line-height: 1.4;
+      color: var(--text);
+      margin-bottom: var(--space-4);
+      position: relative;
+      z-index: 1;
+    }
+
+    .testimonial-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .testimonial-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--crimson-dim);
+      border: 1px solid var(--crimson-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--crimson);
+      flex-shrink: 0;
+    }
+
+    .testimonial-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .testimonial-title {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+    }
+
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: var(--space-5);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .testimonial-card:hover {
+      background: rgba(24,24,27,0.95);
+      border-color: var(--border-hover);
+    }
+
+    .testimonial-card blockquote {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.7;
+      margin-bottom: var(--space-3);
+      font-style: italic;
+    }
+
+    /* ─── Moat / About ──────────────────────────────────────────────── */
+    .section-moat {
+      padding: var(--section-py) 0;
+    }
+
+    .moat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      align-items: center;
+    }
+
+    .moat-left h2 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: var(--space-4);
+    }
+
+    .moat-left p {
+      color: var(--text-2);
+      font-size: 15px;
+      margin-bottom: var(--space-4);
+    }
+
+    .moat-pullquote {
+      border-left: 3px solid var(--crimson);
+      padding-left: var(--space-4);
+      margin: var(--space-6) 0;
+    }
+
+    .moat-pullquote p {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 20px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .credentials-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .credential-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .credential-item:hover {
+      background: rgba(24,24,27,0.95);
+      border-color: var(--border-hover);
+    }
+
+    .credential-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--crimson-dim);
+      border: 1px solid var(--crimson-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--crimson);
+      flex-shrink: 0;
+    }
+
+    .credential-text strong {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      display: block;
+    }
+
+    .credential-text span {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    /* ─── Signal/Noise ──────────────────────────────────────────────── */
+    .section-newsletter {
+      padding: var(--section-py) 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .newsletter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      align-items: start;
+    }
+
+    .newsletter-left h2 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: var(--space-3);
+    }
+
+    .newsletter-left p {
+      color: var(--text-2);
+      font-size: 15px;
+      margin-bottom: var(--space-5);
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .newsletter-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      padding: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .newsletter-input:focus {
+      border-color: var(--crimson);
+    }
+
+    .newsletter-input::placeholder {
+      color: var(--text-3);
+    }
+
+    .issue-cards {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .issue-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .issue-card:hover {
+      background: rgba(24,24,27,0.95);
+      border-color: var(--border-hover);
+    }
+
+    .issue-title {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .issue-meta {
+      font-size: 11px;
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+    }
+
+    /* ─── Not For ───────────────────────────────────────────────────── */
+    .section-not-for {
+      padding: var(--section-py) 0;
+    }
+
+    .not-for-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-2);
+      margin-bottom: var(--space-8);
+    }
+
+    .not-for-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: var(--space-4);
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+    }
+
+    .not-for-card::before {
+      content: '×';
+      color: var(--crimson);
+      font-size: 18px;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .not-for-card p {
+      font-size: 14px;
+      color: var(--text-3);
+      line-height: 1.7;
+    }
+
+    .for-reframe {
+      background: var(--surface);
+      border: 1px solid var(--crimson-glow);
+      padding: var(--space-6);
+      text-align: center;
+    }
+
+    .for-reframe h3 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: var(--space-2);
+    }
+
+    .for-reframe p {
+      color: var(--text-2);
+      font-size: 15px;
+    }
+
+    /* ─── Offer Section ─────────────────────────────────────────────── */
+    .section-offer {
+      padding: var(--section-py) 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .offer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      align-items: start;
+    }
+
+    .offer-stack h2 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(36px, 4.5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: var(--space-6);
+    }
+
+    .offer-items {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .offer-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .offer-item-left strong {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      display: block;
+    }
+
+    .offer-item-left span {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .offer-item-value {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--text-3);
+      text-decoration: line-through;
+    }
+
+    .offer-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-top: 2px solid var(--border);
+    }
+
+    .offer-total strong {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .offer-total-value {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 24px;
+      color: var(--text-3);
+      text-decoration: line-through;
+    }
+
+    .offer-cta-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: var(--space-8);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-4);
+    }
+
+    .offer-price {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2);
+    }
+
+    .offer-price-main {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 72px;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .offer-price-sub {
+      font-size: 14px;
+      color: var(--text-3);
+    }
+
+    .offer-cta-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      width: 100%;
+    }
+
+    .offer-cta-features li {
+      font-size: 13px;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .offer-cta-features li::before {
+      content: '✓';
+      color: var(--crimson);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .offer-cta-box .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .offer-fine {
+      font-size: 11px;
+      color: var(--text-3);
+      text-align: center;
+      width: 100%;
+    }
+
+    /* ─── FAQ ───────────────────────────────────────────────────────── */
+    .section-faq {
+      padding: var(--section-py) 0;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .faq-trigger {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+      gap: var(--space-4);
+      transition: background 0.2s;
+    }
+
+    .faq-trigger:hover {
+      background: rgba(24,24,27,0.95);
+    }
+
+    .faq-question {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .faq-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text-2);
+      transition: transform 0.3s, background 0.2s;
+    }
+
+    .faq-trigger[aria-expanded="true"] .faq-icon {
+      transform: rotate(45deg);
+      background: var(--crimson-dim);
+      border-color: var(--crimson-glow);
+      color: var(--crimson);
+    }
+
+    .faq-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+
+    .faq-body.open {
+      max-height: 400px;
+    }
+
+    .faq-answer {
+      padding: var(--space-3) var(--space-5) var(--space-4);
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.75;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─── Final CTA ─────────────────────────────────────────────────── */
+    .section-final-cta {
+      padding: var(--section-py) 0;
+      text-align: center;
+      position: relative;
+    }
+
+    .section-final-cta::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--crimson-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .section-final-cta .container { position: relative; z-index: 1; }
+
+    .final-cta-h2 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(32px, 5vw, 64px);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      max-width: 760px;
+      margin: 0 auto var(--space-4);
+    }
+
+    .final-cta-sub {
+      max-width: 520px;
+      margin: 0 auto var(--space-6);
+      color: var(--text-2);
+      font-size: 16px;
+    }
+
+    .final-cta-buttons {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ─── Footer ────────────────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: var(--space-8) 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .footer-logo {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .footer-logo span { color: var(--crimson); }
+
+    .footer-links {
+      display: flex;
+      gap: var(--space-5);
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 12px;
+      color: var(--text-3);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text-2); }
+
+    .footer-copy {
+      font-size: 11px;
+      color: var(--text-3);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── Sticky Mobile CTA ─────────────────────────────────────────── */
+    .sticky-mobile-cta {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 90;
+      background: rgba(9,9,11,0.97);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: var(--space-2) var(--space-4);
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sticky-mobile-cta.visible {
+      transform: translateY(0);
+    }
+
+    .sticky-mobile-cta .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+
+      .problem-grid,
+      .pillars-grid,
+      .moat-grid,
+      .newsletter-grid,
+      .offer-grid,
+      .testimonials-grid,
+      .not-for-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stats {
+        gap: var(--space-4);
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .sticky-mobile-cta { display: block; }
+
+      .comparison-table {
+        font-size: 12px;
+      }
+
+      .comparison-table th,
+      .comparison-table td {
+        padding: var(--space-2) var(--space-3);
+      }
+
+      .offer-cta-box {
+        padding: var(--space-5);
+      }
+
+      .testimonial-featured {
+        padding: var(--space-5);
+      }
+    }
+
+    /* ─── Readability System ────────────────────────────────────────── */
+
+    /* Fixed vignette: darkens the terrain at edges so center content pops */
+    #vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, transparent 20%, rgba(9,9,11,0.72) 100%);
+    }
+
+    /* Glass panels: all bordered surface elements get blur so
+       terrain lines are softened behind content, not competing with text */
+    .pillar-card,
+    .bento-card,
+    .testimonial-card,
+    .testimonial-featured,
+    .offer-cta-box,
+    .offer-item,
+    .offer-total,
+    .faq-item,
+    .not-for-card,
+    .for-reframe,
+    .issue-card,
+    .comparison-table,
+    .credential-item {
+      background: rgba(17,17,19,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Headings floating directly over terrain */
+    .hero h1,
+    .section-header h2,
+    .problem-left h2,
+    .offer-stack h2,
+    .final-cta-h2,
+    .moat-left h2,
+    .newsletter-left h2,
+    .shift-quote blockquote {
+      text-shadow: 0 2px 32px rgba(0,0,0,0.95), 0 0 80px rgba(0,0,0,0.6);
+    }
+
+    /* Body text floating directly over terrain */
+    .problem-left p,
+    .moat-left p,
+    .final-cta-sub,
+    .hero-sub,
+    .newsletter-left p,
+    .section-header p,
+    .shift-quote cite,
+    .hero-stat-value,
+    .hero-stat-label {
+      text-shadow: 0 1px 16px rgba(0,0,0,0.9);
+    }
+
+    /* Section label eyebrows */
+    .section-label {
+      text-shadow: 0 1px 12px rgba(0,0,0,0.9);
+    }
+
+    /* Newsletter input glass */
+    .newsletter-input {
+      background: rgba(17,17,19,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Moat pullquote glass panel */
+    .moat-pullquote {
+      background: rgba(17,17,19,0.70);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: var(--space-4);
+      border-left: 3px solid var(--crimson);
+    }
+
+    /* Credential items: glass only (border/padding already in base) */
+    .credential-item {
+      background: rgba(17,17,19,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Footer above canvas */
+    .footer {
+      position: relative;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll Progress Bar -->
+  <div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
+
+  <!-- Ambient Orb -->
+  <div id="ambient-orb" aria-hidden="true"></div>
+
+  <!-- Terrain Canvas -->
+  <canvas id="terrain-canvas" aria-hidden="true"></canvas>
+
+  <!-- Vignette overlay: darkens terrain edges, content stays crisp -->
+  <div id="vignette" aria-hidden="true"></div>
+
+  <!-- ── Navigation ──────────────────────────────────────────────── -->
+  <nav class="nav" id="main-nav" role="navigation" aria-label="Main navigation">
+    <a href="#hero" class="nav-logo">Attune<span>.</span></a>
+    <ul class="nav-links" role="list">
+      <li><a href="#shift" class="nav-link" data-section="shift">Method</a></li>
+      <li><a href="#testimonials" class="nav-link" data-section="testimonials">Results</a></li>
+      <li><a href="#moat" class="nav-link" data-section="moat">About</a></li>
+      <li><a href="#newsletter" class="nav-link" data-section="newsletter">Newsletter</a></li>
+      <li><a href="#offer" class="btn btn-primary nav-cta magnetic-btn">Get Foundations</a></li>
+    </ul>
+    <button class="nav-hamburger" id="hamburger" aria-expanded="false" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="nav-mobile" id="mobile-nav" role="navigation" aria-label="Mobile navigation">
+    <a href="#shift">Method</a>
+    <a href="#testimonials">Results</a>
+    <a href="#moat">About</a>
+    <a href="#newsletter">Newsletter</a>
+    <a href="#offer" class="btn btn-primary" style="text-align:center;justify-content:center;">Get Foundations — $97</a>
+  </div>
+
+  <main>
+
+    <!-- ── Hero ─────────────────────────────────────────────────────── -->
+    <section class="hero" id="hero">
+      <div class="container">
+        <div class="reveal">
+          <span class="hero-label">Foundations · Attune</span>
+        </div>
+
+        <h1>
+          <span class="word">Stop</span>
+          <span class="word"> training</span>
+          <span class="word"> the</span>
+          <span class="word"> pattern.</span>
+          <br>
+          <span class="word">Train</span>
+          <span class="word"> the</span>
+          <span id="cycling-word" class="hero-cycling-word" aria-live="polite">perception.</span>
+        </h1>
+
+        <p class="hero-sub reveal reveal-delay-2">
+          For coaches and athletes who've drilled everything right and still lose it when it counts. Attune is the framework built on the science of why skill transfers — and why it doesn't.
+        </p>
+
+        <div class="hero-ctas reveal reveal-delay-3">
+          <a href="#offer" class="btn btn-primary btn-arrow magnetic-btn">Start Training in the Right Environment</a>
+          <a href="#newsletter" class="btn btn-ghost magnetic-btn">Read Signal/Noise first →</a>
+        </div>
+
+        <div class="hero-stats reveal reveal-delay-4">
+          <div class="hero-stat">
+            <span class="hero-stat-value" data-countup="2" data-suffix="×">0</span>
+            <span class="hero-stat-label">NCAA National Championships</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value" data-countup="6" data-suffix="×">0</span>
+            <span class="hero-stat-label">All-American Honors</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value" data-countup="500" data-suffix="+">0</span>
+            <span class="hero-stat-label">Students Trained</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value" data-countup="5" data-suffix=" yrs">0</span>
+            <span class="hero-stat-label">Deep Study: Gibson, Bernstein, Davids</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Problem Section ──────────────────────────────────────────── -->
+    <section class="section-problem" id="problem" aria-labelledby="problem-heading">
+      <div class="container">
+        <div class="problem-grid">
+          <div class="problem-left reveal">
+            <span class="section-label">Gate 3 · The Problem</span>
+            <h2 id="problem-heading">You recognize this.</h2>
+            <p>Your training was designed for a world that doesn't exist. The one where perfect practice produces perfect performance. Where drilling the mechanic installs the skill.</p>
+          </div>
+          <div class="problem-right reveal reveal-delay-2">
+            <ul class="problem-list" role="list">
+              <li>Tuesday practice: perfect. Saturday game — that person wasn't there.</li>
+              <li>Watched the film 40 times. Mechanics clean. Competition arrives — different athlete.</li>
+              <li>Hired the coach. New drills. Same plateau. Six months later, nothing's changed.</li>
+              <li>The read isn't there. No one can explain why. You've tried everything they've told you to try.</li>
+              <li>Something is fundamentally broken about how skill is being taught. You can't name it yet.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── The Shift ─────────────────────────────────────────────────── -->
+    <section class="section-shift" id="shift" aria-labelledby="shift-heading">
+      <div class="container">
+        <span class="section-label reveal">Gate 4 · The Shift</span>
+        <div class="shift-quote reveal reveal-delay-1">
+          <blockquote>
+            Every rep built in the wrong environment builds skill that works in that environment. And nowhere else. The environment was always the teacher. Most people were just in the wrong classroom.
+          </blockquote>
+          <cite>— The Attune Framework</cite>
+        </div>
+
+        <div class="pillars-grid" role="list">
+          <div class="pillar-card reveal reveal-delay-1" role="listitem">
+            <span class="pillar-number">01</span>
+            <h3>Affordances</h3>
+            <p>The environment doesn't just host performance — it invites it. Gibson showed us that what you perceive determines what you do. Train the perception, not the pattern.</p>
+          </div>
+          <div class="pillar-card reveal reveal-delay-2" role="listitem">
+            <span class="pillar-number">02</span>
+            <h3>Constraints</h3>
+            <p>Remove the wrong constraints and you destroy the skill. Add the right ones and you create the conditions where the solution has to emerge. That's the whole job.</p>
+          </div>
+          <div class="pillar-card reveal reveal-delay-3" role="listitem">
+            <span class="pillar-number">03</span>
+            <h3>Repetition without repetition</h3>
+            <p>Bernstein's insight: true skill isn't the same movement repeated perfectly. It's the same problem solved differently, across conditions. Every rep a new solution.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Before / After ───────────────────────────────────────────── -->
+    <section class="section-comparison" id="comparison" aria-labelledby="comparison-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-label">Two Paradigms</span>
+          <h2 id="comparison-heading">The old model vs. the Attune model</h2>
+        </div>
+        <div class="reveal reveal-delay-1" style="overflow-x: auto;">
+          <table class="comparison-table" role="table" aria-label="Paradigm comparison">
+            <thead>
+              <tr>
+                <th scope="col">Old Paradigm</th>
+                <th scope="col" class="highlight">Attune Paradigm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Prescribe the movement. Correct the error.</td>
+                <td class="highlight">Design the environment. Let the movement emerge.</td>
+              </tr>
+              <tr>
+                <td>Drill until it's automatic. Repeat perfectly.</td>
+                <td class="highlight">Vary the constraints. Build adaptable perception.</td>
+              </tr>
+              <tr>
+                <td>Isolate the skill from competition context.</td>
+                <td class="highlight">Make training representative of performance demands.</td>
+              </tr>
+              <tr>
+                <td>Teach the tactic. Prescribe the read.</td>
+                <td class="highlight">Create conditions where the read has to happen.</td>
+              </tr>
+              <tr>
+                <td>Measure repetitions. Count the reps.</td>
+                <td class="highlight">Measure coupling. Count the right adaptations.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── What's Inside ─────────────────────────────────────────────── -->
+    <section class="section-inside" id="inside" aria-labelledby="inside-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-label">The Curriculum</span>
+          <h2 id="inside-heading">What's inside Foundations</h2>
+          <p>8 sessions that replace the broken model with one that explains why skill transfers — or doesn't.</p>
+        </div>
+        <div class="bento-grid" role="list">
+          <div class="bento-card reveal reveal-delay-1" role="listitem">
+            <span class="module-tag">Module 1</span>
+            <h3>Why Your Training Environment is Lying to You</h3>
+            <p>The first session shifts how you see. Not what you do — how you perceive. Before you change a single drill, you'll understand why your current ones are producing athletes who can't transfer.</p>
+          </div>
+          <div class="bento-card reveal reveal-delay-2" role="listitem">
+            <span class="module-tag">Module 2</span>
+            <h3>Affordances &amp; the Information Athletes Actually Use</h3>
+            <p>Gibson's core insight translated into practice. What are your athletes perceiving? And is it the right information? The answer changes everything about how you design sessions.</p>
+          </div>
+          <div class="bento-card reveal reveal-delay-3" role="listitem">
+            <span class="module-tag">Module 3</span>
+            <h3>Constraints as the Language of Coaching</h3>
+            <p>Stop prescribing. Start designing. The three constraint categories and how to manipulate each one to create the conditions where the solution has to emerge from the athlete.</p>
+          </div>
+          <div class="bento-card reveal reveal-delay-1" role="listitem">
+            <span class="module-tag">Module 4</span>
+            <h3>Designing for Transfer</h3>
+            <p>By Module 4, you'll design differently. What makes a practice environment representative? Why do athletes fall apart in competition? The answer is simpler — and more actionable — than you think.</p>
+          </div>
+          <div class="bento-card reveal reveal-delay-2" role="listitem">
+            <span class="module-tag">Modules 5–7</span>
+            <h3>Applying the Framework Across Domains</h3>
+            <p>From invasion sports to individual performance, from athletics to business decision-making. Ecological dynamics isn't a sports model. It's a perception-action model. It applies everywhere.</p>
+          </div>
+          <div class="bento-card reveal reveal-delay-3" role="listitem">
+            <span class="module-tag">Module 8</span>
+            <h3>The Practitioner's Toolkit</h3>
+            <p>A complete constraint design system you'll use every session for the next year. Paired with the Foundations Workbook — not a PDF, a live constraint design tool.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Testimonials ───────────────────────────────────────────────── -->
+    <section class="section-testimonials" id="testimonials" aria-labelledby="testimonials-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-label">Results</span>
+          <h2 id="testimonials-heading">What students say</h2>
+        </div>
+
+        <div class="testimonial-featured reveal reveal-delay-1">
+          <blockquote>
+            "Six weeks after Module 2, my athletes were reading the game differently — fewer cues from me, more autonomous responses from them. I stopped prescribing and started designing environments."
+          </blockquote>
+          <div class="testimonial-meta">
+            <div class="testimonial-avatar" aria-hidden="true">FF</div>
+            <div>
+              <div class="testimonial-name">Francesco Fonte</div>
+              <div class="testimonial-title">Performance Coach</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonials-grid" role="list">
+          <article class="testimonial-card reveal reveal-delay-1" role="listitem">
+            <blockquote>
+              "Three weeks in, I stopped forcing outcomes and started designing conditions. First month: signed two new partnerships without 'closing' either. The environment was right."
+            </blockquote>
+            <div class="testimonial-meta">
+              <div class="testimonial-avatar" aria-hidden="true">JP</div>
+              <div>
+                <div class="testimonial-name">Jay Pages</div>
+                <div class="testimonial-title">Entrepreneur &amp; Athlete</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="testimonial-card reveal reveal-delay-2" role="listitem">
+            <blockquote>
+              "My students felt the difference in their first session. 15 years of coaching — this framework collapsed everything I thought I knew into something that actually works."
+            </blockquote>
+            <div class="testimonial-meta">
+              <div class="testimonial-avatar" aria-hidden="true">—</div>
+              <div>
+                <div class="testimonial-name">Head Coach</div>
+                <div class="testimonial-title">BJJ Academy (Anonymous)</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="testimonial-card reveal reveal-delay-3" role="listitem">
+            <blockquote>
+              "One drill with manipulation constraints instead of prescriptive cues. I was reading the play two steps earlier. Four weeks later, that's my new baseline."
+            </blockquote>
+            <div class="testimonial-meta">
+              <div class="testimonial-avatar" aria-hidden="true">—</div>
+              <div>
+                <div class="testimonial-name">NCAA Track Athlete</div>
+                <div class="testimonial-title">Division I (Anonymous)</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── The Moat ───────────────────────────────────────────────────── -->
+    <section class="section-moat" id="moat" aria-labelledby="moat-heading">
+      <div class="container">
+        <div class="moat-grid">
+          <div class="moat-left reveal">
+            <span class="section-label">About Sam</span>
+            <h2 id="moat-heading">You are the moat.</h2>
+            <p>The tools are just how water flows. Sam's combination cannot be replicated — not because the science is rare, but because of who learned it and how.</p>
+
+            <div class="moat-pullquote">
+              <p>"I didn't discover ecological dynamics. I lived it for a decade before I had a name for it. That's the difference between someone who studied the theory and someone who forged skill in the field."</p>
+            </div>
+
+            <p>Former 2× NCAA National Champion discus thrower. 6× All-American. A perception-action sport at the highest level — then 5 years studying the science that explained why it worked. Gibson, Bernstein, Davids. Not in a lab. Applied to everything.</p>
+          </div>
+
+          <div class="credentials-stack reveal reveal-delay-2">
+            <div class="credential-item">
+              <div class="credential-icon" aria-hidden="true">2×</div>
+              <div class="credential-text">
+                <strong>NCAA National Champion</strong>
+                <span>Discus throw — highest level of collegiate competition</span>
+              </div>
+            </div>
+            <div class="credential-item">
+              <div class="credential-icon" aria-hidden="true">6×</div>
+              <div class="credential-text">
+                <strong>All-American Honors</strong>
+                <span>5 years of elite performance in a perception-action sport</span>
+              </div>
+            </div>
+            <div class="credential-item">
+              <div class="credential-icon" aria-hidden="true">5yr</div>
+              <div class="credential-text">
+                <strong>Deep Study: Gibson, Bernstein, Davids</strong>
+                <span>The scientists most coaches have never read</span>
+              </div>
+            </div>
+            <div class="credential-item">
+              <div class="credential-icon" aria-hidden="true">SN</div>
+              <div class="credential-text">
+                <strong>Signal/Noise Newsletter</strong>
+                <span>Weekly translation of the science for practitioners</span>
+              </div>
+            </div>
+            <div class="credential-item">
+              <div class="credential-icon" aria-hidden="true">500</div>
+              <div class="credential-text">
+                <strong>500+ Students</strong>
+                <span>Coaches, athletes, and creators across Attune</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Signal/Noise ──────────────────────────────────────────────── -->
+    <section class="section-newsletter" id="newsletter" aria-labelledby="newsletter-heading">
+      <div class="container">
+        <div class="newsletter-grid">
+          <div class="newsletter-left reveal">
+            <span class="section-label">Signal/Noise</span>
+            <h2 id="newsletter-heading">The weekly edge on ecological dynamics.</h2>
+            <p>Every week, one insight from the intersection of ecological psychology, skill acquisition, and creator philosophy. Free. Always will be.</p>
+            <form class="newsletter-form" action="https://substack.com/profile/signup" method="GET" target="_blank" aria-label="Newsletter signup">
+              <input type="email" name="email" class="newsletter-input" placeholder="your@email.com" aria-label="Email address" />
+              <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+          </div>
+
+          <div class="issue-cards reveal reveal-delay-2" aria-label="Recent newsletter issues">
+            <a href="https://signalnoise.substack.com" target="_blank" rel="noopener noreferrer" class="issue-card">
+              <span class="issue-title">The Environment Was Always the Teacher</span>
+              <span class="issue-meta">Recent Issue</span>
+            </a>
+            <a href="https://signalnoise.substack.com" target="_blank" rel="noopener noreferrer" class="issue-card">
+              <span class="issue-title">Repetition Without Repetition: What Bernstein Actually Meant</span>
+              <span class="issue-meta">Recent Issue</span>
+            </a>
+            <a href="https://signalnoise.substack.com" target="_blank" rel="noopener noreferrer" class="issue-card">
+              <span class="issue-title">Why Affordances Explain Everything Your Coach Got Wrong</span>
+              <span class="issue-meta">Recent Issue</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Who This Is NOT For ──────────────────────────────────────── -->
+    <section class="section-not-for" id="not-for" aria-labelledby="not-for-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-label">Honest Disclaimer</span>
+          <h2 id="not-for-heading">Who this is not for</h2>
+        </div>
+
+        <div class="not-for-grid reveal reveal-delay-1">
+          <div class="not-for-card">
+            <p>Coaches who want a plug-and-play drill library with no framework behind it.</p>
+          </div>
+          <div class="not-for-card">
+            <p>Athletes who want someone to prescribe the exact movement and just want to be told what to do.</p>
+          </div>
+          <div class="not-for-card">
+            <p>Anyone unwilling to question why their current training model isn't producing transfer.</p>
+          </div>
+          <div class="not-for-card">
+            <p>People looking for a quick fix, a secret hack, or something that works without them thinking differently first.</p>
+          </div>
+        </div>
+
+        <div class="for-reframe reveal reveal-delay-2">
+          <h3>This is for the ones who suspect the method is broken.</h3>
+          <p>Coaches, athletes, and creators who've felt the gap between training and performance — and are ready to understand why it exists, and what to do about it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── The Offer ─────────────────────────────────────────────────── -->
+    <section class="section-offer" id="offer" aria-labelledby="offer-heading">
+      <div class="container">
+        <div class="offer-grid">
+          <div class="offer-stack reveal">
+            <span class="section-label">Gate 6 · The Offer</span>
+            <h2 id="offer-heading">Everything you need to train in the right environment.</h2>
+
+            <div class="offer-items">
+              <div class="offer-item">
+                <div class="offer-item-left">
+                  <strong>Foundations: 8-Module Curriculum</strong>
+                  <span>Sessions that replace the broken model with one that actually explains transfer.</span>
+                </div>
+                <span class="offer-item-value">$197</span>
+              </div>
+              <div class="offer-item">
+                <div class="offer-item-left">
+                  <strong>The Foundations Workbook</strong>
+                  <span>The field manual you'll use every session for the next year. A constraint design tool.</span>
+                </div>
+                <span class="offer-item-value">$47</span>
+              </div>
+              <div class="offer-item">
+                <div class="offer-item-left">
+                  <strong>Lifetime Updates</strong>
+                  <span>Every new framework and insight as the science advances. Yours without paying twice.</span>
+                </div>
+                <span class="offer-item-value">$53</span>
+              </div>
+            </div>
+
+            <div class="offer-total">
+              <strong>Total Value</strong>
+              <span class="offer-total-value">$297</span>
+            </div>
+          </div>
+
+          <div class="offer-cta-box reveal reveal-delay-2">
+            <span class="section-label">Today's Investment</span>
+            <div class="offer-price">
+              <span class="offer-price-main">$97</span>
+              <span class="offer-price-sub">one-time · no subscription</span>
+            </div>
+
+            <ul class="offer-cta-features" role="list">
+              <li>8 modules on ecological dynamics applied to skill development</li>
+              <li>The Foundations Workbook — constraint design tool</li>
+              <li>Lifetime access + all future updates</li>
+              <li>Works for coaches, athletes, and creators</li>
+              <li>Module 1 shifts how you see. Module 4 shifts how you design.</li>
+            </ul>
+
+            <a href="https://attunemastery.com/foundations" class="btn btn-primary btn-arrow magnetic-btn" style="font-size:15px;padding:16px 32px;">
+              Start Training in the Right Environment
+            </a>
+
+            <p class="offer-fine">One-time payment. Instant access. No recurring fees.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FAQ ───────────────────────────────────────────────────────── -->
+    <section class="section-faq" id="faq" aria-labelledby="faq-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-label">Gate 8 · FAQ</span>
+          <h2 id="faq-heading">Real questions, honest answers.</h2>
+        </div>
+
+        <div class="faq-list reveal reveal-delay-1" role="list">
+          <div class="faq-item" role="listitem">
+            <button class="faq-trigger" aria-expanded="false" aria-controls="faq-1">
+              <span class="faq-question">Who is this actually for?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-body" id="faq-1" role="region">
+              <div class="faq-answer">
+                Coaches who suspect the prescriptive model is broken. Athletes who've done everything right and still lose it when it counts. Creators and entrepreneurs who sense that how you build skill in your domain is fundamentally different from what you've been told. If you feel the gap between your practice and your performance — and you're ready to understand why it exists — this is for you.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-trigger" aria-expanded="false" aria-controls="faq-2">
+              <span class="faq-question">I've tried frameworks before. Why is this different?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-body" id="faq-2" role="region">
+              <div class="faq-answer">
+                Most frameworks are prescriptive — here's the drill, here's the sequence, here's the protocol. Foundations is explanatory. It gives you the model that makes every protocol make sense. When you understand why skill transfers (or doesn't), you can evaluate any drill, any method, any session design. You stop needing someone to tell you what to do. You understand what to design.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-trigger" aria-expanded="false" aria-controls="faq-3">
+              <span class="faq-question">Do I need a science background?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-body" id="faq-3" role="region">
+              <div class="faq-answer">
+                No. Sam teaches from lived experience, not the lab. The science is there because it explains what practitioners have intuitively known — it gives you language for what you've already felt. You won't need to memorize research papers. You'll need to be willing to see your practice environment differently.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-trigger" aria-expanded="false" aria-controls="faq-4">
+              <span class="faq-question">How long until I see results?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-body" id="faq-4" role="region">
+              <div class="faq-answer">
+                Module 1 shifts how you see. Module 4 shifts how you design. Most students who go all the way through the curriculum report measurable differences in their athletes (or their own performance) within 4–6 weeks of applying the framework. The shift in perception is faster. The shift in outcomes takes the time it takes — because that's how ecological dynamics works.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-trigger" aria-expanded="false" aria-controls="faq-5">
+              <span class="faq-question">My athletes won't understand the theory.</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-body" id="faq-5" role="region">
+              <div class="faq-answer">
+                They never need to. You change the environment. They experience better training. That's the whole model. Ecological dynamics isn't something you explain to your athletes — it's something you do to the space they practice in. The theory is for you. The constraints are for them. The results show up in performance.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Final CTA ─────────────────────────────────────────────────── -->
+    <section class="section-final-cta" id="final-cta" aria-labelledby="final-cta-heading">
+      <div class="container">
+        <h2 class="final-cta-h2 reveal" id="final-cta-heading">
+          The gap between your practice and your performance has a name. Foundations gives you that name — and what to do with it.
+        </h2>
+        <p class="final-cta-sub reveal reveal-delay-1">
+          Stop training the pattern. Train the perception.
+        </p>
+        <div class="final-cta-buttons reveal reveal-delay-2">
+          <a href="#offer" class="btn btn-primary btn-arrow magnetic-btn" style="font-size:15px;padding:16px 32px;">
+            Start Training in the Right Environment
+          </a>
+          <a href="https://signalnoise.substack.com" target="_blank" rel="noopener noreferrer" class="btn btn-ghost magnetic-btn">
+            Read Signal/Noise first →
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────────────────────── -->
+  <footer class="footer" aria-label="Site footer">
+    <div class="container">
+      <div class="footer-inner">
+        <a href="#hero" class="footer-logo">Attune<span>.</span></a>
+        <ul class="footer-links" role="list">
+          <li><a href="#shift">Method</a></li>
+          <li><a href="#testimonials">Results</a></li>
+          <li><a href="#moat">About</a></li>
+          <li><a href="https://signalnoise.substack.com" target="_blank" rel="noopener noreferrer">Signal/Noise</a></li>
+          <li><a href="mailto:sam@attunemastery.com">Contact</a></li>
+        </ul>
+        <span class="footer-copy">© 2026 Attune · attunemastery.com</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── Sticky Mobile CTA ──────────────────────────────────────────── -->
+  <div class="sticky-mobile-cta" id="sticky-cta" aria-label="Get Foundations (sticky CTA)">
+    <a href="#offer" class="btn btn-primary btn-arrow">Get Foundations — $97</a>
+  </div>
+
+  <!-- ─── Scripts ──────────────────────────────────────────────────── -->
+  <script>
+  (() => {
+    'use strict';
+
+    /* ── Terrain Canvas ─────────────────────────────────────────── */
+    const canvas = document.getElementById('terrain-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const GW = 160, GH = 110;
+    let animT = 0;
+
+    function resizeCanvas() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+
+    // Multi-octave sine field — organic, flowing terrain
+    function getHeight(nx, ny, t) {
+      return (
+        Math.sin(nx * 3.4 + t * 0.22) * 0.28 +
+        Math.sin(ny * 2.9 - t * 0.17) * 0.24 +
+        Math.sin((nx + ny) * 4.8 + t * 0.11) * 0.20 +
+        Math.sin(nx * 7.2 + ny * 5.1 - t * 0.08) * 0.14 +
+        Math.sin(nx * 1.8 - ny * 6.3 + t * 0.19) * 0.09 +
+        Math.sin(nx * 11 + ny * 4 + t * 0.05) * 0.05
+      );
+    }
+
+    function edgeLerp(a, b, threshold) {
+      const d = b - a;
+      return Math.abs(d) < 0.0001 ? 0.5 : Math.max(0, Math.min(1, (threshold - a) / d));
+    }
+
+    function drawTerrain() {
+      if (!W || !H) return;
+      ctx.clearRect(0, 0, W, H);
+
+      const cellW = W / GW;
+      const cellH = H / GH;
+
+      // Precompute height field
+      const field = [];
+      for (let y = 0; y <= GH; y++) {
+        field[y] = [];
+        for (let x = 0; x <= GW; x++) {
+          field[y][x] = getHeight(x / GW, y / GH, animT);
+        }
+      }
+
+      // ── Grid mesh layer ─────────────────────────────────────────
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.055)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      for (let x = 0; x <= GW; x++) {
+        ctx.moveTo(x * cellW, 0);
+        ctx.lineTo(x * cellW, H);
+      }
+      for (let y = 0; y <= GH; y++) {
+        ctx.moveTo(0, y * cellH);
+        ctx.lineTo(W, y * cellH);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // ── Contour lines ───────────────────────────────────────────
+      const NUM_LEVELS = 52;
+      const MIN_VAL = -0.9, MAX_VAL = 0.9;
+
+      for (let lv = 0; lv < NUM_LEVELS; lv++) {
+        const threshold = MIN_VAL + (lv / NUM_LEVELS) * (MAX_VAL - MIN_VAL);
+
+        const isRidge  = lv % 6 === 0;
+        const isMajor  = lv % 3 === 0;
+        const alpha    = isRidge ? 0.52 : isMajor ? 0.20 : 0.07;
+        const lineW    = isRidge ? 1.2  : isMajor ? 0.7  : 0.4;
+
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+        ctx.lineWidth = lineW;
+
+        for (let y = 0; y < GH; y++) {
+          for (let x = 0; x < GW; x++) {
+            const v00 = field[y][x],   v10 = field[y][x+1];
+            const v01 = field[y+1][x], v11 = field[y+1][x+1];
+
+            const ci =
+              (v00 > threshold ? 8 : 0) |
+              (v10 > threshold ? 4 : 0) |
+              (v11 > threshold ? 2 : 0) |
+              (v01 > threshold ? 1 : 0);
+
+            if (ci === 0 || ci === 15) continue;
+
+            const x0 = x * cellW, x1 = (x+1) * cellW;
+            const y0 = y * cellH, y1 = (y+1) * cellH;
+
+            const top    = { x: x0 + edgeLerp(v00, v10, threshold) * cellW, y: y0 };
+            const bottom = { x: x0 + edgeLerp(v01, v11, threshold) * cellW, y: y1 };
+            const left   = { x: x0, y: y0 + edgeLerp(v00, v01, threshold) * cellH };
+            const right  = { x: x1, y: y0 + edgeLerp(v10, v11, threshold) * cellH };
+
+            // Saddle disambiguation via cell centre
+            const centre = (v00 + v10 + v01 + v11) / 4;
+            const above  = centre > threshold;
+
+            const segs = {
+              1:  [[left, bottom]],
+              2:  [[bottom, right]],
+              3:  [[left, right]],
+              4:  [[top, right]],
+              5:  above ? [[top, right], [left, bottom]] : [[top, left], [right, bottom]],
+              6:  [[top, bottom]],
+              7:  [[top, left]],
+              8:  [[top, left]],
+              9:  [[top, bottom]],
+              10: above ? [[top, right], [left, bottom]] : [[top, left], [right, bottom]],
+              11: [[top, right]],
+              12: [[left, right]],
+              13: [[bottom, right]],
+              14: [[left, bottom]],
+            }[ci];
+
+            if (segs) {
+              segs.forEach(([a, b]) => {
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+              });
+            }
+          }
+        }
+        ctx.stroke();
+      }
+
+      animT += 0.005;
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+
+    (function terrainLoop() {
+      drawTerrain();
+      setTimeout(() => requestAnimationFrame(terrainLoop), 1000 / 30);
+    })();
+
+    /* ── Scroll Progress ────────────────────────────────────────── */
+    const progressBar = document.getElementById('scroll-progress');
+    function updateProgress() {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = total > 0 ? (window.scrollY / total) * 100 : 0;
+      progressBar.style.width = progress + '%';
+    }
+
+    /* ── Nav Scroll ─────────────────────────────────────────────── */
+    const nav = document.getElementById('main-nav');
+    function updateNav() {
+      if (window.scrollY > 80) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    }
+
+    /* ── Section-Aware Nav Highlighting ────────────────────────── */
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = ['shift', 'testimonials', 'moat', 'newsletter'];
+    function updateNavHighlight() {
+      let current = '';
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && window.scrollY >= el.offsetTop - 120) {
+          current = id;
+        }
+      });
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.dataset.section === current);
+      });
+    }
+
+    /* ── Sticky Mobile CTA ──────────────────────────────────────── */
+    const stickyCta = document.getElementById('sticky-cta');
+    function updateStickyCta() {
+      if (window.scrollY > 600) {
+        stickyCta.classList.add('visible');
+      } else {
+        stickyCta.classList.remove('visible');
+      }
+    }
+
+    /* ── Hamburger Menu ─────────────────────────────────────────── */
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobile-nav');
+    hamburger.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('open');
+      hamburger.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', String(open));
+    });
+    mobileNav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    /* ── Scroll Reveal (IntersectionObserver) ───────────────────── */
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -32px 0px' });
+    reveals.forEach(el => revealObserver.observe(el));
+
+    /* ── Countup Animation ──────────────────────────────────────── */
+    const countupEls = document.querySelectorAll('[data-countup]');
+    const countupObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.countup, 10);
+          const suffix = el.dataset.suffix || '';
+          const duration = 1200;
+          const start = performance.now();
+
+          function animate(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(eased * target) + suffix;
+            if (progress < 1) requestAnimationFrame(animate);
+          }
+          requestAnimationFrame(animate);
+          countupObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+    countupEls.forEach(el => countupObserver.observe(el));
+
+    /* ── Hero H1 Word-by-Word Reveal ────────────────────────────── */
+    const h1Words = document.querySelectorAll('.hero h1 .word');
+    h1Words.forEach((word, i) => {
+      setTimeout(() => {
+        word.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        word.style.transform = 'translateY(0)';
+        word.style.opacity = '1';
+      }, 300 + i * 60);
+    });
+    h1Words.forEach(w => { w.style.transform = 'translateY(8px)'; });
+
+    /* ── Hero Word Cycling ──────────────────────────────────────── */
+    const cyclingWords = ['perception.', 'decision.', 'transfer.', 'coupling.', 'emergence.'];
+    let cycleIndex = 0;
+    const cyclingWordEl = document.getElementById('cycling-word');
+
+    function cycleWord() {
+      cyclingWordEl.classList.add('fading');
+      setTimeout(() => {
+        cycleIndex = (cycleIndex + 1) % cyclingWords.length;
+        cyclingWordEl.textContent = cyclingWords[cycleIndex];
+        cyclingWordEl.classList.remove('fading');
+      }, 350);
+    }
+
+    setInterval(cycleWord, 2500);
+
+    /* ── FAQ Accordion ──────────────────────────────────────────── */
+    document.querySelectorAll('.faq-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const expanded = trigger.getAttribute('aria-expanded') === 'true';
+        const bodyId = trigger.getAttribute('aria-controls');
+        const body = document.getElementById(bodyId);
+        const icon = trigger.querySelector('.faq-icon');
+
+        // Close all others
+        document.querySelectorAll('.faq-trigger').forEach(t => {
+          t.setAttribute('aria-expanded', 'false');
+          t.querySelector('.faq-icon').textContent = '+';
+        });
+        document.querySelectorAll('.faq-body').forEach(b => b.classList.remove('open'));
+
+        if (!expanded) {
+          trigger.setAttribute('aria-expanded', 'true');
+          body.classList.add('open');
+          icon.textContent = '×';
+        }
+      });
+    });
+
+    /* ── Ambient Orb ────────────────────────────────────────────── */
+    const orb = document.getElementById('ambient-orb');
+    let orbX = window.innerWidth / 2, orbY = window.innerHeight / 2;
+    let targetX = orbX, targetY = orbY;
+
+    document.addEventListener('mousemove', e => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+    });
+
+    function animateOrb() {
+      orbX += (targetX - orbX) * 0.05;
+      orbY += (targetY - orbY) * 0.05;
+      orb.style.left = orbX + 'px';
+      orb.style.top = orbY + 'px';
+      requestAnimationFrame(animateOrb);
+    }
+    animateOrb();
+
+    /* ── Magnetic Buttons ───────────────────────────────────────── */
+    const magneticBtns = document.querySelectorAll('.magnetic-btn');
+    magneticBtns.forEach(btn => {
+      btn.addEventListener('mousemove', e => {
+        const rect = btn.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (e.clientX - cx) / (rect.width / 2);
+        const dy = (e.clientY - cy) / (rect.height / 2);
+        btn.style.transform = `translate(${dx * 6}px, ${dy * 6}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate(0,0)';
+      });
+    });
+
+    /* ── Scroll Event Aggregator ────────────────────────────────── */
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateProgress();
+          updateNav();
+          updateNavHighlight();
+          updateStickyCta();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    updateProgress();
+    updateNav();
+  })();
+  </script>
+</body>
+</html>
