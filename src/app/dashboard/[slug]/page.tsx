@@ -1,7 +1,6 @@
 // src/app/dashboard/[slug]/page.tsx
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { getModule } from "@/lib/modules";
@@ -12,6 +11,8 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+const mono: React.CSSProperties = { fontFamily: "var(--font-mono)" };
+
 export default async function ModulePage({ params }: Props) {
   const { slug } = await params;
   const mod = getModule(slug);
@@ -21,70 +22,70 @@ export default async function ModulePage({ params }: Props) {
   const completedModules = (user?.publicMetadata?.completedModules as string[] | undefined) ?? [];
 
   return (
-    <main className="text-white min-h-screen flex flex-col">
+    <main
+      className="text-white min-h-screen"
+      style={{ maxWidth: "660px", margin: "0 auto", padding: "clamp(2rem,6vw,3.5rem) 1.5rem clamp(4rem,10vw,6rem)" }}
+    >
 
       {/* NAV */}
-      <nav className="px-[clamp(1.75rem,6vw,5rem)] py-5 flex items-center justify-between border-b border-white/[0.08] shrink-0 bg-black/30 backdrop-blur-2xl">
-        <Link href="/dashboard" className="opacity-70 hover:opacity-100 transition-opacity">
-          <Image
-            src="/attune-logo.png"
-            alt="Attune"
-            width={32}
-            height={32}
-            style={{ filter: "invert(1)", objectFit: "contain" }}
-          />
+      <nav
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "clamp(3rem,8vw,5rem)",
+        }}
+      >
+        <Link
+          href="/dashboard"
+          style={{
+            ...mono,
+            fontSize: "0.625rem",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.35)",
+            textDecoration: "none",
+            transition: "color 0.2s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
+        >
+          ← All Modules
         </Link>
-        <div className="flex items-center gap-5">
-          <p
-            className="hidden sm:block text-[10px] tracking-[0.2em] uppercase text-white/30"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            Foundations
-          </p>
-          <UserButton
-            appearance={{
-              elements: { avatarBox: { width: 32, height: 32 } },
-            }}
-          />
-        </div>
+        <UserButton appearance={{ elements: { avatarBox: { width: 28, height: 28 } } }} />
       </nav>
 
-      {/* TWO-COLUMN BODY */}
+      {/* Module header */}
+      <div style={{ marginBottom: "2.5rem" }}>
+        <p style={{ ...mono, fontSize: "0.575rem", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.25)", marginBottom: "1rem" }}>
+          Module {mod.slug}
+        </p>
+        <h1
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontStyle: "italic",
+            fontWeight: 600,
+            fontSize: "clamp(1.875rem,4vw,3rem)",
+            lineHeight: 1.0,
+            letterSpacing: "-0.02em",
+            color: "#ffffff",
+            marginBottom: "0.5rem",
+          }}
+        >
+          {mod.title}
+        </h1>
+        <p style={{ ...mono, fontSize: "0.575rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.2)" }}>
+          {mod.duration}
+        </p>
+      </div>
+
+      <hr style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.07)", marginBottom: "2.5rem" }} />
+
+      {/* Content + progress/nav */}
       <ModuleProgress currentSlug={slug} initialCompleted={completedModules}>
-
-        {/* Lesson header */}
-        <div className="mb-10">
-          <p
-            className="text-[9px] tracking-[0.3em] uppercase text-white/30 mb-4"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            Module {mod.slug}
-          </p>
-          <h1
-            className="text-[clamp(2rem,4vw,3.2rem)] leading-[1.0] tracking-[-0.02em] text-white mb-3"
-            style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}
-          >
-            {mod.title}
-          </h1>
-          <p
-            className="text-[11px] tracking-[0.15em] uppercase text-white/20"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            {mod.duration}
-          </p>
-        </div>
-
-        <hr className="border-white/[0.06] mb-10" />
-
-        {/* Lesson content */}
-        <article className="relative w-full border border-white/[0.08] bg-[#111110] px-5 sm:px-10 py-10 sm:py-12 overflow-hidden">
-          {/* Gradient overlay */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent" />
-          <div className="relative z-10">
-            <ModuleContent slug={slug} sections={mod.sections} />
-          </div>
+        <article>
+          <ModuleContent slug={slug} sections={mod.sections} />
         </article>
-
       </ModuleProgress>
 
     </main>

@@ -6,8 +6,6 @@ import { useEffect } from "react";
 const SUBSTACK_URL = "https://findthesignal.substack.com/";
 const CHECKOUT_URL = "https://buy.stripe.com/3cIcN5fCp1CR0qz2RBefC04";
 
-/* ── Scroll reveal ───────────────────────────────────────────── */
-
 function useReveal() {
   useEffect(() => {
     const els = document.querySelectorAll("[data-reveal]");
@@ -25,23 +23,14 @@ function useReveal() {
     );
     els.forEach((el) => {
       (el as HTMLElement).style.opacity = "0";
-      (el as HTMLElement).style.transform = "translateY(28px)";
+      (el as HTMLElement).style.transform = "translateY(20px)";
       (el as HTMLElement).style.transition =
-        "opacity 0.95s cubic-bezier(0.16,1,0.3,1), transform 0.95s cubic-bezier(0.16,1,0.3,1)";
+        "opacity 0.7s ease, transform 0.7s ease";
       observer.observe(el);
     });
     return () => observer.disconnect();
   }, []);
 }
-
-/* ── Data ────────────────────────────────────────────────────── */
-
-const stats = [
-  { number: "2×", label: "NCAA Champion" },
-  { number: "6×", label: "All-American" },
-  { number: "500+", label: "Readers" },
-  { number: "5 yrs", label: "Ecological Research" },
-];
 
 const recentIssues = [
   {
@@ -71,22 +60,18 @@ const recentIssues = [
   },
 ];
 
-/* ── Shared token styles ─────────────────────────────────────── */
-
 const eyebrow: React.CSSProperties = {
   fontFamily: "var(--font-mono)",
   fontSize: "0.625rem",
   letterSpacing: "0.22em",
-  textTransform: "uppercase",
+  textTransform: "uppercase" as const,
   color: "rgba(255,255,255,0.3)",
-  marginBottom: "2.5rem",
+  marginBottom: "2rem",
 };
 
-const divider: React.CSSProperties = {
+const border: React.CSSProperties = {
   borderTop: "1px solid rgba(255,255,255,0.07)",
 };
-
-/* ── Page ────────────────────────────────────────────────────── */
 
 export default function Home() {
   useReveal();
@@ -167,32 +152,12 @@ export default function Home() {
       <section
         data-reveal
         style={{
-          position: "relative",
           paddingTop: "clamp(8rem, 22vw, 14rem)",
           paddingBottom: "clamp(5rem, 13vw, 9rem)",
-          overflow: "hidden",
         }}
       >
-        {/* ambient crimson glow */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: "30%",
-            left: "-10%",
-            width: "65%",
-            height: "55%",
-            background:
-              "radial-gradient(ellipse, rgba(225,29,72,0.07) 0%, transparent 68%)",
-            pointerEvents: "none",
-          }}
-        />
+        <p style={eyebrow}>Sam Elsner · Ecological Dynamics · Attune</p>
 
-        <p style={{ ...eyebrow, marginBottom: "2rem" }}>
-          Sam Elsner · Ecological Dynamics · Attune
-        </p>
-
-        {/* The idea is the hero — not the person */}
         <h1
           style={{
             fontFamily: "var(--font-serif)",
@@ -244,7 +209,7 @@ export default function Home() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "1.25rem",
+            gap: "2rem",
             flexWrap: "wrap",
           }}
         >
@@ -258,21 +223,20 @@ export default function Home() {
               gap: "0.5rem",
               backgroundColor: "var(--crimson)",
               color: "#ffffff",
-              fontSize: "0.9375rem",
+              fontSize: "0.8125rem",
               fontWeight: 500,
-              padding: "0.75rem 1.875rem",
-              borderRadius: "9999px",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              padding: "0.75rem 1.75rem",
               textDecoration: "none",
-              transition: "opacity 0.2s, transform 0.2s",
+              transition: "background 0.2s",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.85";
-              e.currentTarget.style.transform = "translateY(-1px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "var(--crimson-bright)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "var(--crimson)")
+            }
           >
             Read Signal/Noise →
           </a>
@@ -296,65 +260,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PROOF BAR ────────────────────────────────────────── */}
-      <section
-        data-reveal
-        style={{
-          ...divider,
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-          paddingTop: "clamp(2.5rem, 7vw, 4rem)",
-          paddingBottom: "clamp(2.5rem, 7vw, 4rem)",
-        }}
-      >
-        <div className="grid grid-cols-2 sm:grid-cols-4">
-          {stats.map((stat, i) => (
-            <div
-              key={i}
-              style={{
-                padding: "0.75rem 0",
-                paddingLeft: i % 2 !== 0 ? "1.5rem" : "0",
-                borderLeft:
-                  i % 2 !== 0 ? "1px solid rgba(255,255,255,0.07)" : "none",
-              }}
-              className={i >= 2 ? "mt-6 sm:mt-0" : ""}
-            >
-              <p
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontStyle: "italic",
-                  fontWeight: 600,
-                  fontSize: "clamp(1.75rem, 4.5vw, 2.75rem)",
-                  color: "#ffffff",
-                  lineHeight: 1,
-                  letterSpacing: "-0.025em",
-                  marginBottom: "0.45rem",
-                }}
-              >
-                {stat.number}
-              </p>
-              <p
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.32)",
-                  lineHeight: 1.5,
-                }}
-              >
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── MANIFESTO ────────────────────────────────────────── */}
       <section
         data-reveal
         style={{
-          paddingTop: "clamp(7rem, 18vw, 12rem)",
-          paddingBottom: "clamp(7rem, 18vw, 12rem)",
+          ...border,
+          paddingTop: "clamp(6rem, 15vw, 10rem)",
+          paddingBottom: "clamp(6rem, 15vw, 10rem)",
         }}
       >
         <h2
@@ -403,14 +315,13 @@ export default function Home() {
       <section
         data-reveal
         style={{
-          ...divider,
+          ...border,
           paddingTop: "clamp(4rem, 10vw, 6.5rem)",
           paddingBottom: "clamp(4rem, 10vw, 6.5rem)",
         }}
       >
         <p style={eyebrow}>The Work</p>
 
-        {/* Foundations row */}
         <a
           href={CHECKOUT_URL}
           target="_blank"
@@ -421,11 +332,9 @@ export default function Home() {
             textDecoration: "none",
             color: "inherit",
             borderTop: "1px solid rgba(255,255,255,0.07)",
-            transition: "padding-left 0.25s cubic-bezier(0.16,1,0.3,1)",
+            transition: "padding-left 0.25s ease",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.paddingLeft = "0.5rem")
-          }
+          onMouseEnter={(e) => (e.currentTarget.style.paddingLeft = "0.5rem")}
           onMouseLeave={(e) => (e.currentTarget.style.paddingLeft = "0")}
         >
           <div
@@ -459,7 +368,7 @@ export default function Home() {
                 flexShrink: 0,
               }}
             >
-              Course · $97 →
+              Course · $197 →
             </span>
           </div>
           <p
@@ -476,7 +385,6 @@ export default function Home() {
           </p>
         </a>
 
-        {/* Signal/Noise row */}
         <a
           href={SUBSTACK_URL}
           target="_blank"
@@ -488,11 +396,9 @@ export default function Home() {
             color: "inherit",
             borderTop: "1px solid rgba(255,255,255,0.07)",
             borderBottom: "1px solid rgba(255,255,255,0.07)",
-            transition: "padding-left 0.25s cubic-bezier(0.16,1,0.3,1)",
+            transition: "padding-left 0.25s ease",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.paddingLeft = "0.5rem")
-          }
+          onMouseEnter={(e) => (e.currentTarget.style.paddingLeft = "0.5rem")}
           onMouseLeave={(e) => (e.currentTarget.style.paddingLeft = "0")}
         >
           <div
@@ -643,7 +549,7 @@ export default function Home() {
       <section
         data-reveal
         style={{
-          ...divider,
+          ...border,
           paddingTop: "clamp(4rem, 10vw, 6.5rem)",
           paddingBottom: "clamp(4rem, 10vw, 6.5rem)",
         }}
@@ -689,7 +595,7 @@ export default function Home() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "1.25rem",
+            gap: "2rem",
             flexWrap: "wrap",
           }}
         >
@@ -703,15 +609,20 @@ export default function Home() {
               gap: "0.5rem",
               backgroundColor: "var(--crimson)",
               color: "#ffffff",
-              fontSize: "0.875rem",
+              fontSize: "0.8125rem",
               fontWeight: 500,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
               padding: "0.625rem 1.5rem",
-              borderRadius: "9999px",
               textDecoration: "none",
-              transition: "opacity 0.2s",
+              transition: "background 0.2s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "var(--crimson-bright)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "var(--crimson)")
+            }
           >
             Read Signal/Noise →
           </a>
@@ -740,12 +651,11 @@ export default function Home() {
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer
         style={{
-          ...divider,
+          ...border,
           paddingTop: "clamp(4rem, 10vw, 6rem)",
           paddingBottom: "clamp(3rem, 8vw, 5rem)",
         }}
       >
-        {/* closing statement */}
         <p
           style={{
             fontFamily: "var(--font-serif)",
@@ -775,10 +685,7 @@ export default function Home() {
             { label: "Signal/Noise", href: SUBSTACK_URL },
             { label: "Foundations", href: CHECKOUT_URL },
             { label: "X", href: "https://x.com/samelsner" },
-            {
-              label: "Instagram",
-              href: "https://instagram.com/sam.elsner",
-            },
+            { label: "Instagram", href: "https://instagram.com/sam.elsner" },
           ].map(({ label, href }) => (
             <a
               key={label}

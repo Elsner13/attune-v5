@@ -3,66 +3,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
 import { modules, getNextModule, type Module } from "@/lib/modules";
-import {
-  Sidebar,
-  SidebarBody,
-  SidebarLink,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import { LayoutDashboard } from "lucide-react";
 
-/* ── Module icon: numbered circle ─────────────────────────────── */
-function ModuleIcon({ slug, done, active }: { slug: string; done: boolean; active: boolean }) {
-  return (
-    <span
-      className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full border text-[9px] transition-colors"
-      style={{
-        borderColor: active
-          ? "rgba(225,29,72,0.80)"
-          : done
-          ? "rgba(255,255,255,0.5)"
-          : "rgba(255,255,255,0.15)",
-        background: done ? "rgba(255,255,255,0.15)" : "transparent",
-        color: active ? "rgba(225,29,72,0.95)" : "rgba(255,255,255,0.4)",
-        fontFamily: "var(--font-mono)",
-      }}
-    >
-      {done ? "✓" : slug}
-    </span>
-  );
-}
+const mono: React.CSSProperties = { fontFamily: "var(--font-mono)" };
 
-/* ── Logo shown when sidebar is expanded ──────────────────────── */
-function SidebarLogo() {
-  const { open, animate } = useSidebar();
-  return (
-    <Link href="/dashboard" className="flex items-center gap-3 px-2 py-1 mb-6">
-      <Image
-        src="/attune-logo.png"
-        alt="Attune"
-        width={24}
-        height={24}
-        style={{ filter: "invert(1)", objectFit: "contain", flexShrink: 0 }}
-      />
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        transition={{ duration: 0.15 }}
-        className="text-[10px] tracking-[0.25em] uppercase text-white/30 whitespace-pre !p-0 !m-0"
-        style={{ fontFamily: "var(--font-mono)" }}
-      >
-        Foundations
-      </motion.span>
-    </Link>
-  );
-}
-
-/* ── Main component ───────────────────────────────────────────── */
 interface Props {
   currentSlug: string;
   initialCompleted: string[];
@@ -74,21 +18,21 @@ export default function ModuleProgress({ currentSlug, initialCompleted, children
   const [marking, setMarking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
     const onScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = el;
-      setProgress(scrollHeight <= clientHeight ? 0 : scrollTop / (scrollHeight - clientHeight));
+      const el = document.documentElement;
+      const total = el.scrollHeight - el.clientHeight;
+      setProgress(total > 0 ? el.scrollTop / total : 0);
     };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const isComplete = completed.includes(currentSlug);
   const nextModule: Module | undefined = getNextModule(currentSlug);
+  const currentIndex = modules.findIndex((m) => m.slug === currentSlug);
 
   async function handleComplete() {
     if (isComplete || marking) return;
@@ -110,106 +54,148 @@ export default function ModuleProgress({ currentSlug, initialCompleted, children
     }
   }
 
-  // Build sidebar links from modules
-  const moduleLinks = modules.map((mod) => ({
-    label: mod.title,
-    href: `/dashboard/${mod.slug}`,
-    icon: (
-      <ModuleIcon
-        slug={mod.slug}
-        done={completed.includes(mod.slug)}
-        active={mod.slug === currentSlug}
-      />
-    ),
-    isActive: mod.slug === currentSlug,
-  }));
-
   return (
-    <div className="flex flex-1 min-h-0 flex-col md:flex-row">
-      <Sidebar animate={true}>
-        <SidebarBody className="justify-between gap-6">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            <SidebarLogo />
+    <>
+      {/* Reading progress bar */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "2px",
+          background: "rgba(255,255,255,0.05)",
+          zIndex: 100,
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            background: "var(--crimson)",
+            width: `${progress * 100}%`,
+            transition: "width 0.1s linear",
+            opacity: 0.7,
+          }}
+        />
+      </div>
 
-            {/* Module links */}
-            <div className="flex flex-col gap-0.5">
-              {moduleLinks.map((link) => (
-                <SidebarLink
-                  key={link.href}
-                  link={link}
-                  className={
-                    link.isActive
-                      ? "bg-white/[0.04] !text-white border-r-2 border-[#E11D48]/70"
-                      : ""
-                  }
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom: back to dashboard */}
-          <SidebarLink
-            link={{
-              label: "All Modules",
-              href: "/dashboard",
-              icon: <LayoutDashboard size={16} className="text-white/40 flex-shrink-0" />,
-            }}
-            className="border-t border-white/[0.06] pt-4 mt-2"
-          />
-        </SidebarBody>
-      </Sidebar>
-
-      {/* ── Content ─────────────────────────────────────────── */}
-      <div ref={scrollRef} className="flex-1 px-[clamp(1.5rem,5vw,4rem)] py-10 overflow-y-auto">
-        {/* Reading progress bar */}
-        <div className="h-[2px] sticky top-0 z-10 bg-white/[0.05] -mx-[clamp(1.5rem,5vw,4rem)] mb-8">
-          <div
-            className="h-full transition-[width] duration-75"
-            style={{ background: "rgba(225,29,72,0.65)", width: `${progress * 100}%` }}
-          />
-        </div>
+      <div ref={contentRef}>
         {children}
 
-        {/* Action block */}
-        <div className="relative mt-16 border border-white/[0.08] bg-[#111110] px-6 py-6 overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent" />
-          <div className="relative z-10">
-            {error && <p className="text-red-400 text-[12px] mb-4">{error}</p>}
-            {isComplete ? (
-              <div className="flex items-center justify-between">
-                <span
-                  className="text-[11px] tracking-[0.15em] uppercase text-white/30"
-                  style={{ fontFamily: "var(--font-mono)" }}
+        {/* Module nav */}
+        <div
+          style={{
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+            marginTop: "3rem",
+            paddingTop: "2rem",
+          }}
+        >
+          {error && (
+            <p style={{ fontSize: "0.8125rem", color: "#f43f5e", marginBottom: "1rem" }}>
+              {error}
+            </p>
+          )}
+
+          {isComplete ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+              <span style={{ ...mono, fontSize: "0.625rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.28)" }}>
+                Completed ✓
+              </span>
+              {nextModule && (
+                <Link
+                  href={`/dashboard/${nextModule.slug}`}
+                  style={{ ...mono, fontSize: "0.625rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
                 >
-                  Completed ✓
-                </span>
-                {nextModule && (
-                  <Link
-                    href={`/dashboard/${nextModule.slug}`}
-                    className="text-[11px] tracking-[0.12em] uppercase text-white/50 hover:text-white transition-colors"
-                    style={{ fontFamily: "var(--font-mono)" }}
-                  >
-                    Continue to Module {nextModule.slug} →
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <button
-                onClick={handleComplete}
-                disabled={marking}
-                className="w-full text-[11px] font-semibold tracking-[0.1em] uppercase px-8 py-4 transition-colors disabled:opacity-50 cursor-pointer"
-                style={{ background: "var(--crimson)", color: "#0A0907" }}
-                onMouseEnter={e => !marking && (e.currentTarget.style.background = "var(--crimson-bright)")}
-                onMouseLeave={e => (e.currentTarget.style.background = "var(--crimson)")}
+                  Continue to Module {nextModule.slug} →
+                </Link>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={handleComplete}
+              disabled={marking}
+              style={{
+                width: "100%",
+                background: "var(--crimson)",
+                color: "#ffffff",
+                fontSize: "0.8125rem",
+                fontWeight: 500,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                padding: "0.875rem 1.75rem",
+                border: "none",
+                cursor: marking ? "not-allowed" : "pointer",
+                opacity: marking ? 0.5 : 1,
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) => !marking && (e.currentTarget.style.background = "var(--crimson-bright)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "var(--crimson)")}
+            >
+              {nextModule
+                ? `Mark complete — continue to Module ${nextModule.slug} →`
+                : "Mark complete — return to all modules →"}
+            </button>
+          )}
+        </div>
+
+        {/* Module list nav */}
+        <div style={{ marginTop: "3rem", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "1.5rem" }}>
+          <p style={{ ...mono, fontSize: "0.575rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.2)", marginBottom: "1rem" }}>
+            All modules
+          </p>
+          {modules.map((mod, i) => {
+            const done = completed.includes(mod.slug);
+            const active = mod.slug === currentSlug;
+            return (
+              <Link
+                key={mod.slug}
+                href={`/dashboard/${mod.slug}`}
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: "1rem",
+                  padding: "0.75rem 0",
+                  borderTop: i === 0 ? "1px solid rgba(255,255,255,0.07)" : "none",
+                  borderBottom: "1px solid rgba(255,255,255,0.07)",
+                  textDecoration: "none",
+                  color: "inherit",
+                  opacity: active ? 1 : done ? 0.38 : 0.6,
+                  transition: "opacity 0.2s",
+                }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.opacity = "0.85"; }}
+                onMouseLeave={(e) => { if (!active) e.currentTarget.style.opacity = done ? "0.38" : "0.6"; }}
               >
-                {nextModule
-                  ? `Complete — continue to Module ${nextModule.slug} →`
-                  : "Complete — return to dashboard →"}
-              </button>
-            )}
-          </div>
+                <span style={{ ...mono, fontSize: "0.575rem", letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", flexShrink: 0 }}>
+                  {mod.slug}
+                </span>
+                <span
+                  style={{
+                    fontSize: "0.875rem",
+                    color: active ? "#ffffff" : done ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.65)",
+                    textDecoration: done && !active ? "line-through" : "none",
+                    fontWeight: active ? 500 : 400,
+                  }}
+                >
+                  {mod.title}
+                </span>
+                {active && (
+                  <span style={{ ...mono, fontSize: "0.525rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--crimson)", marginLeft: "auto" }}>
+                    Current
+                  </span>
+                )}
+                {done && !active && (
+                  <span style={{ ...mono, fontSize: "0.525rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.22)", marginLeft: "auto" }}>
+                    Done ✓
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </>
   );
 }
